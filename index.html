@@ -336,6 +336,70 @@
     border: 1px solid var(--line);
   }
 
+  /* ---------- FAQ ---------- */
+  section.faq{
+    padding: 46px 0 8px;
+    border-top: 1px solid var(--line);
+  }
+  .faq-head{
+    text-align: center;
+    margin-bottom: 26px;
+  }
+  .faq-head h2{
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(22px, 4.4vw, 28px);
+    margin: 0 0 8px;
+    color: var(--sage-deep);
+  }
+  .faq-head p{
+    margin: 0 auto;
+    max-width: 46ch;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+  .faq-list{
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .faq-item{
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 4px 18px;
+  }
+  .faq-item summary{
+    list-style: none;
+    cursor: pointer;
+    padding: 16px 30px 16px 0;
+    position: relative;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .faq-item summary::-webkit-details-marker{ display: none; }
+  .faq-item summary::after{
+    content: "+";
+    position: absolute;
+    right: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--sage);
+    transition: transform .2s ease;
+  }
+  .faq-item[open] summary::after{
+    content: "\2212";
+  }
+  .faq-item p{
+    margin: 0 0 16px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+
   /* ---------- FOOTER ---------- */
   footer{
     text-align: center;
@@ -395,6 +459,33 @@
   }
   #wa-note strong{ display:block; margin-bottom:2px; color: var(--sage-deep); }
 
+  .wa-btn-col{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .wa-label{
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    color: #fff;
+    background: var(--wa-deep);
+    padding: 4px 11px;
+    border-radius: 20px;
+    white-space: nowrap;
+    box-shadow: 0 5px 14px rgba(32,67,51,.28);
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity .25s ease .05s, transform .25s ease .05s;
+    pointer-events: none;
+  }
+  .wa-label.show{
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   #wa-btn{
     width: 54px;
     height: 54px;
@@ -451,6 +542,16 @@
     </div>
   </main>
 
+  <section class="faq wrap">
+    <div class="faq-head">
+      <h2>Pertanyaan yang Sering Ditanyakan</h2>
+      <p>Beberapa hal yang biasanya ditanyakan sebelum pesan website.</p>
+    </div>
+    <div class="faq-list" id="faq-list">
+      <!-- item FAQ dibuat otomatis oleh JS dari CONFIG.faq -->
+    </div>
+  </section>
+
   <footer>
     <div id="footer-text"></div>
   </footer>
@@ -462,12 +563,15 @@
       <strong id="wa-note-title">Tanya-tanya dulu</strong>
       <span id="wa-note-body">Ketuk ikon hijau untuk chat kami di WhatsApp.</span>
     </div>
-    <a id="wa-btn" target="_blank" rel="noopener" aria-label="Chat WhatsApp">
-      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16 4C9.4 4 4 9.4 4 16c0 2.2.6 4.3 1.7 6.1L4 28l6.1-1.6A11.9 11.9 0 0 0 16 28c6.6 0 12-5.4 12-12S22.6 4 16 4Z" fill="none" stroke="#fff" stroke-width="1.6"/>
-        <path d="M11.3 11.2c.3-.6.6-.6.9-.6h.7c.2 0 .5 0 .7.6.3.7.9 2.2 1 2.4.1.2.1.4 0 .6-.1.2-.2.4-.4.6l-.5.6c-.2.2-.3.4-.1.7.2.4 1 1.6 2.1 2.5 1.4 1.2 2.5 1.6 2.9 1.8.3.2.5.1.7-.1l.6-.7c.2-.3.5-.2.7-.1l2.1 1c.2.1.4.2.5.3.1.2.1.9-.2 1.6-.3.7-1.5 1.4-2.1 1.4-.6.1-1.2.2-4-1-3.3-1.4-5.4-4.7-5.6-4.9-.2-.2-1.3-1.7-1.3-3.3 0-1.6.8-2.3 1.1-2.6Z" fill="#fff"/>
-      </svg>
-    </a>
+    <div class="wa-btn-col">
+      <span class="wa-label" id="wa-label">Tanya Abibo</span>
+      <a id="wa-btn" target="_blank" rel="noopener" aria-label="Chat WhatsApp">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 4C9.4 4 4 9.4 4 16c0 2.2.6 4.3 1.7 6.1L4 28l6.1-1.6A11.9 11.9 0 0 0 16 28c6.6 0 12-5.4 12-12S22.6 4 16 4Z" fill="none" stroke="#fff" stroke-width="1.6"/>
+          <path d="M11.3 11.2c.3-.6.6-.6.9-.6h.7c.2 0 .5 0 .7.6.3.7.9 2.2 1 2.4.1.2.1.4 0 .6-.1.2-.2.4-.4.6l-.5.6c-.2.2-.3.4-.1.7.2.4 1 1.6 2.1 2.5 1.4 1.2 2.5 1.6 2.9 1.8.3.2.5.1.7-.1l.6-.7c.2-.3.5-.2.7-.1l2.1 1c.2.1.4.2.5.3.1.2.1.9-.2 1.6-.3.7-1.5 1.4-2.1 1.4-.6.1-1.2.2-4-1-3.3-1.4-5.4-4.7-5.6-4.9-.2-.2-1.3-1.7-1.3-3.3 0-1.6.8-2.3 1.1-2.6Z" fill="#fff"/>
+        </svg>
+      </a>
+    </div>
   </div>
 
 <script>
@@ -486,8 +590,8 @@
 
     // Judul & teks pengantar
     siteTitle:  "Abibo Studio",
-    tagline:    "Kami membangun website ringan dan rapi untuk berbagai kebutuhan bisnis.",
-    introText:  "Ini beberapa contoh website yang sudah kami buat. Ketuk salah satu kartu untuk lihat pratinjau, buka langsung, atau tanya-tanya lebih dulu.",
+    tagline:    "Website Booking Penginapan, dengan Gaya yang Sesuai Karakter Anda.",
+    introText:  "Jelajahi berbagai contoh website booking untuk hotel, villa, homestay, kos, dan penginapan dengan pilihan tema yang berbeda.",
     footerText: "&copy; " + new Date().getFullYear() + " Abibo Studio",
 
     // Logo (link Google Drive otomatis dikonversi jadi gambar langsung)
@@ -548,6 +652,34 @@
         ]
       }
       // { id: "baru", label: "Nama Tab Baru", links: [ { name: "...", url: "..." } ] },
+    ],
+
+    // ------------------------------------------------------------
+    // FAQ SINGKAT
+    // Tambah pertanyaan baru = tambah satu objek baru di array ini:
+    //   { q: "Pertanyaan", a: "Jawaban" }
+    // ------------------------------------------------------------
+    faq: [
+      {
+        q: "Apakah nama dan warna website bisa diganti?",
+        a: "Bisa. Nama usaha, logo, warna tema, dan teks di dalamnya kami sesuaikan sepenuhnya dengan brand kamu, bukan sekadar template yang ditempel nama."
+      },
+      {
+        q: "Apakah bisa menggunakan domain sendiri?",
+        a: "Bisa. Website bisa dipasang di domain milikmu sendiri (misalnya namausaha.com), atau kami bantu carikan domain baru kalau belum punya."
+      },
+      {
+        q: "Apakah website bisa menerima booking?",
+        a: "Bisa. Kami sediakan form booking/reservasi yang terhubung langsung ke WhatsApp, jadi setiap ada pesanan masuk kamu langsung menerima notifikasinya."
+      },
+      {
+        q: "Berapa lama waktu pengerjaannya?",
+        a: "Rata-rata 2\u20135 hari kerja untuk desain siap pakai, tergantung tingkat kustomisasi dan seberapa cepat materi (foto, teks, logo) dari kamu kami terima."
+      },
+      {
+        q: "Apakah website bisa dibuka di HP?",
+        a: "Bisa. Semua website dibuat responsif sejak awal, jadi tampilannya tetap rapi dan mudah digunakan baik di HP, tablet, maupun laptop."
+      }
     ]
   };
 
@@ -758,6 +890,24 @@
     });
   }
 
+  // --- Bangun daftar FAQ dari CONFIG.faq ---
+  const faqList = document.getElementById('faq-list');
+  (CONFIG.faq || []).forEach(function(item, i){
+    const details = document.createElement('details');
+    details.className = 'faq-item';
+    if (i === 0) details.open = true;
+
+    const summary = document.createElement('summary');
+    summary.textContent = item.q;
+
+    const answer = document.createElement('p');
+    answer.textContent = item.a;
+
+    details.appendChild(summary);
+    details.appendChild(answer);
+    faqList.appendChild(details);
+  });
+
   // Posisi awal indikator + reposisi saat ukuran layar berubah
   window.addEventListener('load', function(){ moveIndicator(tabButtons[0]); });
   window.addEventListener('resize', function(){
@@ -776,9 +926,16 @@
 
   // --- Bubble WhatsApp mengambang ---
   const waBtn = document.getElementById('wa-btn');
+  const waLabel = document.getElementById('wa-label');
   const waNote = document.getElementById('wa-note');
   const waNoteTitle = document.getElementById('wa-note-title');
   let hideTimer = null;
+
+  // Tombol WA + label "Tanya Abibo" langsung tampil sejak halaman dibuka,
+  // dengan pesan konsultasi umum (bukan menunggu kartu produk diketuk).
+  waBtn.href = buildWaLink(CONFIG.siteTitle);
+  waBtn.classList.add('show');
+  waLabel.classList.add('show');
 
   function showWaBubble(name){
     waBtn.href = buildWaLink(name);
