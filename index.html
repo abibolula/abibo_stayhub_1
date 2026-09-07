@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Abibo Studio</title>
+<style>
+
+  /* ============================================================
+     1. TOKEN / VARIABEL TAMPILAN
+     Ubah warna, jarak, dan radius di sini untuk mengubah
+     tampilan seluruh halaman.
+  ============================================================ */
+  :root{
+    --paper:      #F5F3EC;
+    --paper-soft: #EFEBE0;
+    --ink:        #1F2420;
+    --ink-soft:   #5B6259;
+    --sage:       #445340;
+    --sage-deep:  #303B2D;
+    --gold:       #B98B2E;
+    --line:       #DCD6C6;
+    --card-bg:    #FFFFFF;
+    --wa:         #2E5F45;
+    --wa-deep:    #204333;
+
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+
+    --maxw: 880px;
+    --gap: 20px;
+
+    --font-display: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ -webkit-text-size-adjust: 100%; }
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection{ background: var(--gold); color: #fff; }
+
+  a{ color: inherit; }
+  button{ font-family: inherit; }
+
+  :focus-visible{
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+
+  .wrap{
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* ---------- HEADER ---------- */
+  header.hero{
+    padding: 56px 0 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .logo-badge{
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 1px 0 rgba(0,0,0,.03);
+  }
+  .logo-badge img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .logo-badge .logo-fallback{
+    font-family: var(--font-display);
+    font-size: 26px;
+    color: var(--sage-deep);
+    letter-spacing: .02em;
+  }
+
+  h1.site-title{
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(30px, 6vw, 42px);
+    margin: 0 0 10px;
+    color: var(--sage-deep);
+  }
+
+  p.tagline{
+    margin: 0 auto 22px;
+    max-width: 46ch;
+    color: var(--ink-soft);
+    font-size: 15.5px;
+  }
+
+  p.intro{
+    margin: 0 auto;
+    max-width: 52ch;
+    font-size: 15px;
+    color: var(--ink-soft);
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    display: inline-block;
+  }
+
+  /* ---------- TAB KATEGORI ---------- */
+  .tabs-nav{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 34px 0 6px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs-nav::-webkit-scrollbar{ display: none; }
+
+  .tab-btn{
+    position: relative;
+    background: none;
+    border: none;
+    padding: 10px 18px 14px;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 16.5px;
+    letter-spacing: .02em;
+    color: var(--ink-soft);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color .2s ease;
+  }
+  .tab-btn:hover{ color: var(--sage-deep); }
+  .tab-btn[aria-selected="true"]{
+    color: var(--sage-deep);
+    font-weight: 600;
+  }
+
+  .tab-indicator{
+    position: absolute;
+    bottom: -1px;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 2px;
+    transition: left .28s cubic-bezier(.65,0,.35,1), width .28s cubic-bezier(.65,0,.35,1);
+  }
+
+  .tab-panel{ padding-top: 30px; }
+  .tab-panel[hidden]{ display: none; }
+
+  /* ---------- GRID KARTU ---------- */
+  main{
+    padding: 12px 0 90px;
+  }
+
+  .grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--gap);
+  }
+
+  .card{
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px 22px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .18s ease, transform .18s ease;
+    overflow: hidden;
+  }
+  .card:hover{
+    border-color: var(--sage);
+  }
+  .card:active{
+    transform: scale(.99);
+  }
+  .card.is-open{
+    border-color: var(--sage);
+  }
+
+  /* --- Kotak preview website: iframe hanya dimuat saat kartu diketuk --- */
+  .card-preview{
+    position: relative;
+    width: calc(100% + 32px);
+    margin: -14px -16px 14px;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--paper-soft);
+    border-bottom: 1px solid var(--line);
+  }
+  .card-preview .preview-skeleton{
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: opacity .25s ease;
+  }
+  .card-preview .preview-skeleton .mono{
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--sage);
+    opacity: .6;
+  }
+  .card-preview .preview-skeleton .hint{
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    letter-spacing: .02em;
+  }
+  .card-preview.is-loaded .preview-skeleton{
+    opacity: 0;
+    pointer-events: none;
+  }
+  .card-preview iframe{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 250%;
+    height: 250%;
+    border: 0;
+    transform: scale(.4);
+    transform-origin: 0 0;
+    pointer-events: none;   /* preview saja, tidak untuk berinteraksi */
+    opacity: 0;
+    transition: opacity .3s ease;
+  }
+  .card-preview.is-loaded iframe{
+    opacity: 1;
+  }
+  .card-preview .preview-badge{
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    background: rgba(31,36,32,.72);
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: .03em;
+    padding: 3px 7px;
+    border-radius: 20px;
+    pointer-events: none;
+  }
+
+  .card-icon{
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: var(--paper-soft);
+    color: var(--sage-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: .02em;
+  }
+  .card-preview + .card-icon{
+    display: none; /* kalau preview aktif, ikon bulat tidak perlu tampil lagi */
+  }
+
+  .card-name{
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: var(--ink);
+  }
+
+  .card-sub{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  /* baris tombol, tersembunyi sampai kartu diklik */
+  .card-actions{
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows .22s ease, opacity .18s ease, margin-top .22s ease;
+    margin-top: 0;
+  }
+  .card.is-open .card-actions{
+    grid-template-rows: 1fr;
+    opacity: 1;
+    margin-top: 16px;
+  }
+  .card-actions-inner{
+    overflow: hidden;
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn{
+    flex: 1;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .15s ease;
+  }
+  .btn:hover{ opacity: .88; }
+
+  .btn-lihat{
+    background: var(--sage-deep);
+    color: #fff;
+  }
+  .btn-tanya{
+    background: var(--paper-soft);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    text-align: center;
+    padding: 28px 20px 60px;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+  }
+  footer a{
+    color: var(--sage-deep);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* ---------- BUBBLE WHATSAPP MENGAMBANG ---------- */
+  #wa-float{
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    z-index: 60;
+    pointer-events: none;
+  }
+
+  #wa-note{
+    max-width: 220px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    font-size: 12.5px;
+    color: var(--ink);
+    box-shadow: 0 6px 20px rgba(31,36,32,.10);
+    position: relative;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .2s ease, transform .2s ease;
+    pointer-events: none;
+  }
+  #wa-note.show{
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  #wa-note button{
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    font-size: 14px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+  }
+  #wa-note strong{ display:block; margin-bottom:2px; color: var(--sage-deep); }
+
+  #wa-btn{
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: var(--wa);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 22px rgba(32,67,51,.35);
+    text-decoration: none;
+    transform: scale(0);
+    opacity: 0;
+    transition: transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease, background .15s ease;
+    pointer-events: none;
+  }
+  #wa-btn.show{
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #wa-btn:hover{ background: var(--wa-deep); }
+  #wa-btn svg{ width: 26px; height: 26px; }
+
+  @media (max-width: 480px){
+    header.hero{ padding: 44px 0 32px; }
+    .tabs-nav{ justify-content: flex-start; }
+    .grid{ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+    .card{ padding: 20px 14px 18px; }
+    #wa-note{ max-width: 168px; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="wrap">
+      <div class="logo-badge" id="logo-badge">
+        <!-- gambar logo diisi otomatis lewat JS, dengan fallback teks -->
+      </div>
+      <h1 class="site-title" id="site-title"></h1>
+      <p class="tagline" id="site-tagline"></p>
+      <p class="intro" id="site-intro"></p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="tabs-nav" id="tabs-nav" role="tablist">
+      <!-- tombol tab dibuat otomatis oleh JS dari CONFIG.tabs -->
+      <span class="tab-indicator" id="tab-indicator"></span>
+    </div>
+
+    <div id="tab-panels">
+      <!-- panel + grid kartu dibuat otomatis oleh JS dari CONFIG.tabs -->
+    </div>
+  </main>
+
+  <footer>
+    <div id="footer-text"></div>
+  </footer>
+
+  <!-- Bubble WhatsApp mengambang -->
+  <div id="wa-float">
+    <div id="wa-note">
+      <button type="button" id="wa-note-close" aria-label="Tutup">&times;</button>
+      <strong id="wa-note-title">Tanya-tanya dulu</strong>
+      <span id="wa-note-body">Ketuk ikon hijau untuk chat kami di WhatsApp.</span>
+    </div>
+    <a id="wa-btn" target="_blank" rel="noopener" aria-label="Chat WhatsApp">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 4C9.4 4 4 9.4 4 16c0 2.2.6 4.3 1.7 6.1L4 28l6.1-1.6A11.9 11.9 0 0 0 16 28c6.6 0 12-5.4 12-12S22.6 4 16 4Z" fill="none" stroke="#fff" stroke-width="1.6"/>
+        <path d="M11.3 11.2c.3-.6.6-.6.9-.6h.7c.2 0 .5 0 .7.6.3.7.9 2.2 1 2.4.1.2.1.4 0 .6-.1.2-.2.4-.4.6l-.5.6c-.2.2-.3.4-.1.7.2.4 1 1.6 2.1 2.5 1.4 1.2 2.5 1.6 2.9 1.8.3.2.5.1.7-.1l.6-.7c.2-.3.5-.2.7-.1l2.1 1c.2.1.4.2.5.3.1.2.1.9-.2 1.6-.3.7-1.5 1.4-2.1 1.4-.6.1-1.2.2-4-1-3.3-1.4-5.4-4.7-5.6-4.9-.2-.2-1.3-1.7-1.3-3.3 0-1.6.8-2.3 1.1-2.6Z" fill="#fff"/>
+      </svg>
+    </a>
+  </div>
+
+<script>
+(function(){
+
+  /* ============================================================
+
+ ██████╗ ██████╗ ███╗   ██╗███████╗██╗ ██████╗
+██╔════╝██╔═══██╗████╗  ██║██╔════╝██║██╔════╝
+██║     ██║   ██║██╔██╗ ██║█████╗  ██║██║  ███╗
+██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║   ██║
+╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝
+ ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝
+  ============================================================ */
+  const CONFIG = {
+
+    // Judul & teks pengantar
+    siteTitle:  "Abibo Studio",
+    tagline:    "Kami membangun website ringan dan rapi untuk berbagai kebutuhan bisnis.",
+    introText:  "Ini beberapa contoh website yang sudah kami buat. Ketuk salah satu kartu untuk lihat pratinjau, buka langsung, atau tanya-tanya lebih dulu.",
+    footerText: "&copy; " + new Date().getFullYear() + " Abibo Studio",
+
+    // Logo (link Google Drive otomatis dikonversi jadi gambar langsung)
+    logoDriveId: "13o-zNBSidt2ANuLY8Bv6EOcpKz8vvHsJ",
+    logoInitials: "AS", // dipakai jika gambar logo gagal dimuat
+
+    // Nomor WhatsApp tujuan (format internasional tanpa + atau spasi)
+    whatsappNumber: "6287885245385",
+
+    // Template pesan otomatis. {name} akan diganti nama link yang diklik.
+    waMessageTemplate: "Halo, saya mau tanya tentang website \"{name}\" 🙏",
+
+    // Label kecil di bawah nama pada tiap kartu (opsional, boleh dikosongkan "")
+    cardSubLabel: "Lihat contoh",
+
+    // Preview live website di dalam kartu (iframe kecil, bukan screenshot).
+    // Untuk menjaga performa di HP, preview BARU dimuat saat kartunya
+    // diketuk/dibuka — bukan otomatis semua sekaligus.
+    // Set false kalau ingin kartu selalu polos tanpa preview sama sekali.
+    // Catatan: preview hanya muncul jika situs tujuan tidak memblokir
+    // penyematan iframe (X-Frame-Options / CSP). Kalau blank setelah
+    // diketuk, matikan previewnya per-link lewat "preview: false".
+    previewEnabled: true,
+
+    // ------------------------------------------------------------
+    // TAB KATEGORI
+    // Tambah tab baru = tambah satu objek baru di array ini:
+    //   { id: "id-unik", label: "Nama Tab", links: [ ... ] }
+    // Tab akan otomatis muncul di navigasi, tidak perlu ubah HTML/CSS.
+    // ------------------------------------------------------------
+    tabs: [
+      {
+        id: "elegant",
+        label: "Elegant",
+        links: [
+          { name: "Kosan Meranti 2", url: "https://kos-meranti-v3.vercel.app/" },
+          { name: "Kosan Meranti 3", url: "https://kos-meranti-v2.vercel.app/" },
+          // { name: "Nama Link Baru", url: "https://contoh-link.vercel.app/", preview: false },
+        ]
+      },
+      {
+        id: "jepang",
+        label: "Jepang",
+        links: [
+          { name: "Japan 1", url: "https://japan-1-lilac.vercel.app/" },
+          { name: "Japan 2", url: "https://japan-2-sandy.vercel.app/" },
+          { name: "Japan 3", url: "https://japan-3-sigma.vercel.app/" }
+        ]
+      },
+      {
+        id: "modern",
+        label: "Modern",
+        links: [
+          { name: "Modern 1", url: "https://modern-1-gold.vercel.app/" },
+          { name: "Modern 2", url: "https://modern-2-zeta.vercel.app/" },
+        ]
+      }
+      // { id: "baru", label: "Nama Tab Baru", links: [ { name: "...", url: "..." } ] },
+    ]
+  };
+
+
+  /* ============================================================
+     3. LOGIKA RENDER (tidak perlu diedit untuk pemakaian biasa)
+  ============================================================ */
+
+  // --- Isi teks-teks dari CONFIG ---
+  document.title = CONFIG.siteTitle;
+  document.getElementById('site-title').textContent = CONFIG.siteTitle;
+  document.getElementById('site-tagline').textContent = CONFIG.tagline;
+  document.getElementById('site-intro').textContent = CONFIG.introText;
+  document.getElementById('footer-text').innerHTML = CONFIG.footerText;
+
+  // --- Logo: coba beberapa sumber gambar Google Drive, lalu fallback teks ---
+  (function loadLogo(){
+    const badge = document.getElementById('logo-badge');
+    const id = CONFIG.logoDriveId;
+    const sources = id ? [
+      "https://lh3.googleusercontent.com/d/" + id + "=w300",
+      "https://drive.google.com/uc?export=view&id=" + id,
+      "https://drive.google.com/thumbnail?id=" + id + "&sz=w300"
+    ] : [];
+
+    const img = new Image();
+    img.alt = CONFIG.siteTitle + " logo";
+    let i = 0;
+
+    function tryNext(){
+      if (i >= sources.length){
+        const fallback = document.createElement('span');
+        fallback.className = 'logo-fallback';
+        fallback.textContent = CONFIG.logoInitials || CONFIG.siteTitle.slice(0,2).toUpperCase();
+        badge.appendChild(fallback);
+        return;
+      }
+      img.src = sources[i++];
+    }
+
+    img.onload = function(){ badge.appendChild(img); };
+    img.onerror = tryNext;
+    tryNext();
+  })();
+
+  function initials(name){
+    return name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(w => w[0].toUpperCase())
+      .join('');
+  }
+
+  function buildWaLink(name){
+    const msg = CONFIG.waMessageTemplate.replace('{name}', name);
+    return "https://wa.me/" + CONFIG.whatsappNumber + "?text=" + encodeURIComponent(msg);
+  }
+
+  // Preview HANYA dimuat saat kartu diketuk terbuka — jaga performa di HP.
+  function loadPreview(box){
+    if (!box || box.querySelector('iframe')) return;
+    const url = box.getAttribute('data-url');
+    if (!url) return;
+    const iframe = document.createElement('iframe');
+    iframe.loading = 'lazy';
+    iframe.referrerPolicy = 'no-referrer';
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms');
+    iframe.setAttribute('tabindex', '-1');
+    iframe.setAttribute('aria-hidden', 'true');
+    iframe.src = url;
+    iframe.addEventListener('load', function(){
+      box.classList.add('is-loaded');
+    });
+    box.appendChild(iframe);
+  }
+
+  // Hanya satu kartu boleh terbuka (menampilkan tombol Lihat/Tanya) dalam satu waktu
+  let openCard = null;
+
+  // Semua kotak preview akan ditampung di sini, lalu dimuat otomatis
+  // secara bertahap (lihat bagian bawah) supaya HP tidak lag saat
+  // membuka banyak website sekaligus.
+  const allPreviewBoxes = [];
+
+  // --- Bangun satu kartu ---
+  function buildCard(link){
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-expanded', 'false');
+
+    const showPreview = CONFIG.previewEnabled && link.preview !== false;
+
+    const previewHtml = showPreview
+      ? '<div class="card-preview" data-url="' + link.url + '">' +
+          '<div class="preview-skeleton">' +
+            '<span class="mono">' + initials(link.name) + '</span>' +
+            '<span class="hint">memuat pratinjau…</span>' +
+          '</div>' +
+          '<span class="preview-badge">pratinjau</span>' +
+        '</div>'
+      : '';
+
+    card.innerHTML =
+      previewHtml +
+      '<div class="card-icon">' + initials(link.name) + '</div>' +
+      '<p class="card-name">' + link.name + '</p>' +
+      (CONFIG.cardSubLabel ? '<p class="card-sub">' + CONFIG.cardSubLabel + '</p>' : '') +
+      '<div class="card-actions"><div class="card-actions-inner">' +
+        '<button type="button" class="btn btn-lihat">Lihat</button>' +
+        '<button type="button" class="btn btn-tanya">Tanya</button>' +
+      '</div></div>';
+
+    const previewBox = showPreview ? card.querySelector('.card-preview') : null;
+    if (previewBox) allPreviewBoxes.push(previewBox);
+
+    function toggleOpen(){
+      const willOpen = !card.classList.contains('is-open');
+
+      if (openCard && openCard !== card){
+        openCard.classList.remove('is-open');
+        openCard.setAttribute('aria-expanded', 'false');
+      }
+
+      card.classList.toggle('is-open', willOpen);
+      card.setAttribute('aria-expanded', String(willOpen));
+      openCard = willOpen ? card : null;
+    }
+
+    card.addEventListener('click', function(e){
+      if (e.target.closest('.btn')) return; // biar tombol punya handler sendiri
+      toggleOpen();
+    });
+    card.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        toggleOpen();
+      }
+    });
+
+    card.querySelector('.btn-lihat').addEventListener('click', function(e){
+      e.stopPropagation();
+      window.open(link.url, '_blank', 'noopener');
+    });
+
+    card.querySelector('.btn-tanya').addEventListener('click', function(e){
+      e.stopPropagation();
+      showWaBubble(link.name);
+    });
+
+    return card;
+  }
+
+  // --- Bangun tab navigasi + panel dari CONFIG.tabs ---
+  const tabsNav = document.getElementById('tabs-nav');
+  const tabIndicator = document.getElementById('tab-indicator');
+  const tabPanels = document.getElementById('tab-panels');
+
+  const tabButtons = [];
+
+  CONFIG.tabs.forEach(function(tab, index){
+    // Tombol tab
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tab-btn';
+    btn.id = 'tab-btn-' + tab.id;
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-controls', 'panel-' + tab.id);
+    btn.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+    btn.textContent = tab.label;
+    btn.addEventListener('click', function(){ activateTab(tab.id); });
+    tabsNav.insertBefore(btn, tabIndicator);
+    tabButtons.push(btn);
+
+    // Panel + grid kartu
+    const panel = document.createElement('div');
+    panel.className = 'tab-panel';
+    panel.id = 'panel-' + tab.id;
+    panel.setAttribute('role', 'tabpanel');
+    panel.setAttribute('aria-labelledby', btn.id);
+    if (index !== 0) panel.hidden = true;
+
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    tab.links.forEach(function(link){
+      grid.appendChild(buildCard(link));
+    });
+    panel.appendChild(grid);
+    tabPanels.appendChild(panel);
+  });
+
+  function moveIndicator(btn){
+    if (!btn) return;
+    tabIndicator.style.left = btn.offsetLeft + 'px';
+    tabIndicator.style.width = btn.offsetWidth + 'px';
+  }
+
+  function activateTab(id){
+    CONFIG.tabs.forEach(function(tab){
+      const btn = document.getElementById('tab-btn-' + tab.id);
+      const panel = document.getElementById('panel-' + tab.id);
+      const active = tab.id === id;
+      btn.setAttribute('aria-selected', String(active));
+      panel.hidden = !active;
+      if (active) moveIndicator(btn);
+    });
+  }
+
+  // Posisi awal indikator + reposisi saat ukuran layar berubah
+  window.addEventListener('load', function(){ moveIndicator(tabButtons[0]); });
+  window.addEventListener('resize', function(){
+    const current = tabButtons.find(b => b.getAttribute('aria-selected') === 'true');
+    moveIndicator(current);
+  });
+  moveIndicator(tabButtons[0]);
+
+  // --- Muat semua preview secara otomatis, satu per satu dengan jeda ---
+  // Jeda antar-preview mencegah semua iframe dirender bersamaan (penyebab
+  // utama lag di HP). Ubah STAGGER_MS untuk mempercepat/memperlambat.
+  const STAGGER_MS = 220;
+  allPreviewBoxes.forEach(function(box, i){
+    setTimeout(function(){ loadPreview(box); }, i * STAGGER_MS);
+  });
+
+  // --- Bubble WhatsApp mengambang ---
+  const waBtn = document.getElementById('wa-btn');
+  const waNote = document.getElementById('wa-note');
+  const waNoteTitle = document.getElementById('wa-note-title');
+  let hideTimer = null;
+
+  function showWaBubble(name){
+    waBtn.href = buildWaLink(name);
+    waNoteTitle.textContent = 'Tanya soal "' + name + '"';
+    waBtn.classList.add('show');
+    waNote.classList.add('show');
+
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function(){
+      waNote.classList.remove('show');
+    }, 6000);
+  }
+
+  document.getElementById('wa-note-close').addEventListener('click', function(){
+    waNote.classList.remove('show');
+  });
+
+})();
+</script>
+</body>
+</html>
