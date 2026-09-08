@@ -558,13 +558,17 @@
     color: var(--ink-soft);
     font-size: 14px;
   }
-  .steps-hint{
+  .steps-carousel{
+    position: relative;
+  }
+  .steps-viewport{
+    overflow: hidden;
+  }
+  .steps-arrow{
     display: none;
-    text-align: center;
-    font-size: 12px;
-    color: var(--sage-deep);
-    font-weight: 600;
-    margin: 10px 0 -4px;
+  }
+  .steps-dots{
+    display: none;
   }
   .steps-list{
     display: grid;
@@ -736,24 +740,69 @@
 
   @media (max-width: 760px){
     .steps-list{
-      display: flex;
-      grid-template-columns: none;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      gap: 14px;
-      margin: 0 -20px;
-      padding: 4px 20px 16px;
-    }
-    .steps-list::-webkit-scrollbar{ display: none; }
-    .step-item{
-      flex: 0 0 76%;
-      max-width: 300px;
-      scroll-snap-align: center;
-    }
-    .steps-hint{
       display: block;
+      grid-template-columns: none;
+      position: relative;
+      min-height: 190px;
+    }
+    .step-item{
+      display: block;
+      position: absolute;
+      inset: 0;
+      padding: 0 46px;
+      opacity: 0;
+      transform: translateX(8px);
+      pointer-events: none;
+      transition: opacity .3s ease, transform .3s ease;
+    }
+    .step-item.is-active{
+      position: relative;
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+    .steps-arrow{
+      display: flex;
+      position: absolute;
+      top: 32px;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 1px solid var(--line);
+      color: var(--sage-deep);
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 5px 12px rgba(31,36,32,.09);
+      z-index: 2;
+      transition: opacity .15s ease, transform .12s ease;
+    }
+    .steps-arrow:active{ transform: scale(.9); }
+    .steps-arrow:disabled{ opacity: .3; cursor: default; }
+    .steps-arrow-prev{ left: -4px; }
+    .steps-arrow-next{ right: -4px; }
+    .steps-dots{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 22px;
+    }
+    .steps-dot{
+      width: 8px;
+      height: 8px;
+      padding: 0;
+      border: none;
+      border-radius: 5px;
+      background: var(--line);
+      cursor: pointer;
+      transition: width .25s ease, background .25s ease;
+    }
+    .steps-dot.active{
+      width: 22px;
+      background: var(--gold);
     }
   }
 
@@ -763,7 +812,6 @@
     .grid{ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
     .card{ padding: 20px 14px 18px; }
     #wa-note{ max-width: 168px; }
-    .step-item{ flex-basis: 82%; }
   }
 
   /* ---------- TAMPILAN LAPTOP / DESKTOP ---------- */
@@ -823,10 +871,18 @@
     <div class="steps-head">
       <h2>Cara Pesan</h2>
       <p>Prosesnya singkat, dari pilih tema sampai website siap dipakai.</p>
-      <p class="steps-hint">Geser untuk lihat langkah berikutnya &rarr;</p>
     </div>
-    <div class="steps-list" id="steps-list">
-      <!-- item langkah dibuat otomatis oleh JS dari CONFIG.steps -->
+    <div class="steps-carousel">
+      <button type="button" class="steps-arrow steps-arrow-prev" id="steps-prev" aria-label="Langkah sebelumnya">&#8249;</button>
+      <div class="steps-viewport">
+        <div class="steps-list" id="steps-list">
+          <!-- item langkah dibuat otomatis oleh JS dari CONFIG.steps -->
+        </div>
+      </div>
+      <button type="button" class="steps-arrow steps-arrow-next" id="steps-next" aria-label="Langkah berikutnya">&#8250;</button>
+    </div>
+    <div class="steps-dots" id="steps-dots">
+      <!-- titik indikator dibuat otomatis oleh JS -->
     </div>
   </section>
 
@@ -971,6 +1027,9 @@
           { name: "Luxury 1", url: "https://stayhub-luxury-1.vercel.app/" },
           { name: "Luxury 2", url: "https://stayhub-luxury-2.vercel.app/" },
           { name: "Luxury 3", url: "https://stayhub-luxury-3.vercel.app/" },
+          { name: "Luxury 4", url: "https://stayhub-luxury-4.vercel.app/" },
+          { name: "Luxury 5", url: "https://stayhub-luxury-5.vercel.app/" },
+          { name: "Luxury 6", url: "https://stayhub-luxury-6.vercel.app/" }
           // { name: "Nama Link Baru", url: "https://contoh-link.vercel.app/", preview: false },
         ]
       },
@@ -980,7 +1039,10 @@
         links: [
           { name: "Minimalist 1", url: "https://stayhub-minimalist-1.vercel.app/" },
           { name: "Minimalist 2", url: "https://stayhub-minimalist-2.vercel.app/" },
-          { name: "Minimalist 3", url: "https://stayhub-minimalist-3.vercel.app/" }
+          { name: "Minimalist 3", url: "https://stayhub-minimalist-3.vercel.app/" },
+          { name: "Minimalist 4", url: "https://stayhub-minimalist-4.vercel.app/" },
+          { name: "Minimalist 5", url: "https://stayhub-minimalist-5.vercel.app/" },
+          { name: "Minimalist 6", url: "https://stayhub-minimalist-6.vercel.app/" }
         ]
       },
       {
@@ -990,6 +1052,30 @@
           { name: "Blank and White 1", url: "https://stayhub-bnw-1.vercel.app/" },
           { name: "Blank and White 2", url: "https://stayhub-bnw-2.vercel.app/" },
           { name: "Blank and White 3", url: "https://stayhub-bnw-3.vercel.app/" },
+          { name: "Blank and White 4", url: "https://stayhub-bnw-4.vercel.app/" },
+          { name: "Blank and White 5", url: "https://stayhub-bnw-5.vercel.app/" },
+          { name: "Blank and White 6", url: "https://stayhub-bnw-6.vercel.app/" },
+        ]
+      },
+      {
+        id: "cozy",
+        label: "Cozy",
+        links: [
+          { name: "Cozy 1", url: "https://stayhub-wnc-1.vercel.app/" },
+        ]
+      },
+      {
+        id: "nature",
+        label: "Nature",
+        links: [
+          { name: "Nature 1", url: "https://stayhub-nature-1.vercel.app/" },
+        ]
+      },
+      {
+        id: "dark",
+        label: "Dark",
+        links: [
+          { name: "Dark 1", url: "https://stayhub-moderndark-1.vercel.app/" },
         ]
       }
       // { id: "baru", label: "Nama Tab Baru", links: [ { name: "...", url: "..." } ] },
@@ -1109,6 +1195,50 @@
       '<p class="step-desc">' + step.desc + '</p>';
     stepsList.appendChild(item);
   });
+
+  // --- Kontrol carousel "Cara Pesan" (klik panah / dots, khusus mobile) ---
+  const stepsTotal = (CONFIG.steps || []).length;
+  const stepsPrevBtn = document.getElementById('steps-prev');
+  const stepsNextBtn = document.getElementById('steps-next');
+  const stepsDotsWrap = document.getElementById('steps-dots');
+  let stepIndex = 0;
+
+  for (let i = 0; i < stepsTotal; i++){
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'steps-dot';
+    dot.setAttribute('aria-label', 'Ke langkah ' + (i + 1));
+    dot.addEventListener('click', function(){
+      stepIndex = i;
+      updateStepsCarousel();
+    });
+    stepsDotsWrap.appendChild(dot);
+  }
+
+  function isMobileSteps(){
+    return window.matchMedia('(max-width: 760px)').matches;
+  }
+
+  function updateStepsCarousel(){
+    const mobile = isMobileSteps();
+    Array.from(stepsList.children).forEach(function(item, i){
+      item.classList.toggle('is-active', !mobile || i === stepIndex);
+    });
+    Array.from(stepsDotsWrap.children).forEach(function(dot, i){
+      dot.classList.toggle('active', i === stepIndex);
+    });
+    stepsPrevBtn.disabled = stepIndex === 0;
+    stepsNextBtn.disabled = stepIndex === stepsTotal - 1;
+  }
+
+  stepsPrevBtn.addEventListener('click', function(){
+    if (stepIndex > 0){ stepIndex--; updateStepsCarousel(); }
+  });
+  stepsNextBtn.addEventListener('click', function(){
+    if (stepIndex < stepsTotal - 1){ stepIndex++; updateStepsCarousel(); }
+  });
+  window.addEventListener('resize', updateStepsCarousel);
+  updateStepsCarousel();
 
   function buildWaLink(name){
     const msg = CONFIG.waMessageTemplate.replace('{name}', name);
@@ -1353,7 +1483,7 @@
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if ('IntersectionObserver' in window && !prefersReducedMotion){
     const revealTargets = document.querySelectorAll(
-      '.card, .step-item, .faq-item, .steps-head, .faq-head'
+      '.card, .faq-item, .steps-head, .faq-head'
     );
     revealTargets.forEach(function(el, i){
       el.classList.add('reveal');
