@@ -36,7 +36,7 @@
   }
 
   *{ box-sizing: border-box; }
-  html{ -webkit-text-size-adjust: 100%; }
+  html{ -webkit-text-size-adjust: 100%; overflow-x: hidden; }
   body{
     margin:0;
     background: var(--paper);
@@ -44,7 +44,38 @@
     font-family: var(--font-body);
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
+    position: relative;
+    overflow-x: hidden;
   }
+
+  /* Dekorasi latar lembut — memberi kedalaman di layar besar tanpa
+     mengganggu tampilan di HP (tetap halus, non-interaktif). */
+  body::before,
+  body::after{
+    content: "";
+    position: fixed;
+    z-index: -1;
+    border-radius: 50%;
+    filter: blur(70px);
+    pointer-events: none;
+  }
+  body::before{
+    width: 480px;
+    height: 480px;
+    top: -160px;
+    right: -140px;
+    background: radial-gradient(circle, var(--gold) 0%, transparent 72%);
+    opacity: .22;
+  }
+  body::after{
+    width: 560px;
+    height: 560px;
+    bottom: -220px;
+    left: -180px;
+    background: radial-gradient(circle, var(--sage) 0%, transparent 72%);
+    opacity: .16;
+  }
+
   ::selection{ background: var(--gold); color: #fff; }
 
   a{ color: inherit; }
@@ -58,6 +89,28 @@
   @media (prefers-reduced-motion: reduce){
     *{ animation-duration: .001ms !important; transition-duration: .001ms !important; }
   }
+
+  /* ---------- SCROLL REVEAL ----------
+     Ditambahkan via JS ke kartu, item langkah, item FAQ, dan judul
+     section. Kelas "reveal" = kondisi awal tersembunyi, "is-visible"
+     ditambahkan lewat IntersectionObserver saat elemen masuk layar.
+  ------------------------------------- */
+  .reveal{
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity .5s ease, transform .5s ease;
+  }
+  .reveal.is-visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Kartu sudah punya animasi hover sendiri (transform), jadi saat
+     reveal cukup fade tanpa geser supaya tidak tabrakan dengan efek hover. */
+  .card.reveal{
+    transform: none;
+    transition: border-color .18s ease, transform .18s ease, opacity .5s ease;
+  }
+  .card.reveal.is-visible{ opacity: 1; }
 
   .wrap{
     max-width: var(--maxw);
@@ -152,6 +205,7 @@
     transition: color .2s ease;
   }
   .tab-btn:hover{ color: var(--sage-deep); }
+  .tab-btn:active{ opacity: .7; }
   .tab-btn[aria-selected="true"]{
     color: var(--sage-deep);
     font-weight: 600;
@@ -187,6 +241,7 @@
     padding: 14px 16px 22px;
     text-align: center;
     cursor: pointer;
+    position: relative;
     transition: border-color .18s ease, transform .18s ease;
     overflow: hidden;
   }
@@ -322,9 +377,10 @@
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: opacity .15s ease;
+    transition: opacity .15s ease, transform .12s ease;
   }
   .btn:hover{ opacity: .88; }
+  .btn:active{ transform: scale(.95); }
 
   .btn-lihat{
     background: var(--sage-deep);
@@ -338,7 +394,8 @@
 
   /* ---------- FAQ ---------- */
   section.faq{
-    padding: 46px 0 8px;
+    padding-top: 46px;
+    padding-bottom: 8px;
     border-top: 1px solid var(--line);
   }
   .faq-head{
@@ -363,54 +420,209 @@
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
   .faq-item{
     background: var(--card-bg);
     border: 1px solid var(--line);
-    border-radius: var(--radius-md);
-    padding: 4px 18px;
+    border-radius: var(--radius-lg);
+    padding: 4px 20px;
+    box-shadow: 0 2px 9px rgba(31,36,32,.045);
+    transition: box-shadow .2s ease, border-color .2s ease;
+  }
+  .faq-item[open]{
+    border-color: var(--gold);
+    box-shadow: 0 14px 28px rgba(31,36,32,.09);
   }
   .faq-item summary{
     list-style: none;
     cursor: pointer;
-    padding: 16px 30px 16px 0;
-    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 0;
     font-size: 14.5px;
     font-weight: 600;
     color: var(--ink);
   }
   .faq-item summary::-webkit-details-marker{ display: none; }
-  .faq-item summary::after{
-    content: "+";
-    position: absolute;
-    right: 2px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 18px;
-    color: var(--sage);
-    transition: transform .2s ease;
+  .faq-item summary:active{ opacity: .65; }
+  .faq-q{ flex: 1; }
+  .faq-icon{
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--paper-soft);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--sage-deep);
+    transition: transform .25s ease, background .2s ease, border-color .2s ease, color .2s ease;
   }
-  .faq-item[open] summary::after{
-    content: "\2212";
+  .faq-item[open] .faq-icon{
+    transform: rotate(45deg);
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #fff;
   }
   .faq-item p{
-    margin: 0 0 16px;
+    margin: -4px 0 18px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
     font-size: 13.5px;
     color: var(--ink-soft);
+    line-height: 1.6;
   }
 
   /* ---------- FOOTER ---------- */
   footer{
-    text-align: center;
-    padding: 28px 20px 60px;
-    color: var(--ink-soft);
-    font-size: 12.5px;
+    border-top: 1px solid var(--line);
+    padding: 40px 20px 100px;
   }
-  footer a{
+  .footer-inner{
+    text-align: center;
+  }
+  .footer-cta{
+    margin: 0 0 18px;
+  }
+  .footer-cta a{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--wa);
+    color: #fff;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 11px 22px;
+    border-radius: 40px;
+    transition: background .15s ease, transform .12s ease;
+  }
+  .footer-cta a:hover{ background: var(--wa-deep); }
+  .footer-cta a:active{ transform: scale(.96); }
+  .footer-links{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 0 0 10px;
+  }
+  .footer-links a{
+    color: var(--sage-deep);
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .footer-links a:hover{ text-decoration: underline; }
+  .footer-hours{
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+  }
+  .footer-copy{
+    color: var(--ink-soft);
+    font-size: 12px;
+    margin: 0;
+  }
+  .footer-copy a{
     color: var(--sage-deep);
     text-decoration: underline;
     text-underline-offset: 2px;
+  }
+
+  /* ---------- CARA PESAN ---------- */
+  section.steps{
+    padding-top: 46px;
+    padding-bottom: 10px;
+    border-top: 1px solid var(--line);
+  }
+  .steps-head{
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .steps-head h2{
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(22px, 4.4vw, 28px);
+    margin: 0 0 8px;
+    color: var(--sage-deep);
+  }
+  .steps-head p{
+    margin: 0 auto;
+    max-width: 46ch;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+  .steps-hint{
+    display: none;
+    text-align: center;
+    font-size: 12px;
+    color: var(--sage-deep);
+    font-weight: 600;
+    margin: 10px 0 -4px;
+  }
+  .steps-list{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px 16px;
+  }
+  .step-item{
+    text-align: center;
+    padding: 0 6px;
+  }
+  .step-num{
+    width: 38px;
+    height: 38px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    background: var(--sage-deep);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 16px;
+  }
+  .step-title{
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: var(--ink);
+  }
+  .step-desc{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* ---------- HARGA ---------- */
+  .price-badge{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    background: var(--gold);
+    color: #fff;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .01em;
+    padding: 4px 10px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(185,139,46,.3);
+    white-space: nowrap;
+  }
+  .tab-price-note{
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sage-deep);
+    margin: -6px 0 20px;
   }
 
   /* ---------- BUBBLE WHATSAPP MENGAMBANG ---------- */
@@ -507,7 +719,43 @@
     pointer-events: auto;
   }
   #wa-btn:hover{ background: var(--wa-deep); }
-  #wa-btn svg{ width: 26px; height: 26px; }
+  #wa-btn:active{ transform: scale(.9); }
+  #wa-btn svg{
+    width: 26px;
+    height: 26px;
+    animation: wa-wiggle 6s ease-in-out infinite;
+  }
+  @keyframes wa-wiggle{
+    0%, 88%, 100% { transform: rotate(0deg); }
+    90% { transform: rotate(-14deg); }
+    92% { transform: rotate(11deg); }
+    94% { transform: rotate(-7deg); }
+    96% { transform: rotate(4deg); }
+    98% { transform: rotate(0deg); }
+  }
+
+  @media (max-width: 760px){
+    .steps-list{
+      display: flex;
+      grid-template-columns: none;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      gap: 14px;
+      margin: 0 -20px;
+      padding: 4px 20px 16px;
+    }
+    .steps-list::-webkit-scrollbar{ display: none; }
+    .step-item{
+      flex: 0 0 76%;
+      max-width: 300px;
+      scroll-snap-align: center;
+    }
+    .steps-hint{
+      display: block;
+    }
+  }
 
   @media (max-width: 480px){
     header.hero{ padding: 44px 0 32px; }
@@ -515,6 +763,35 @@
     .grid{ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
     .card{ padding: 20px 14px 18px; }
     #wa-note{ max-width: 168px; }
+    .step-item{ flex-basis: 82%; }
+  }
+
+  /* ---------- TAMPILAN LAPTOP / DESKTOP ---------- */
+  @media (min-width: 1024px){
+    :root{ --maxw: 1060px; --gap: 24px; }
+
+    header.hero{ padding: 76px 0 56px; }
+    .logo-badge{ width: 88px; height: 88px; }
+    p.tagline{ font-size: 17px; }
+
+    .grid{ grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+
+    @media (hover: hover) and (pointer: fine){
+      .card{ transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease; }
+      .card:hover{
+        transform: translateY(-4px);
+        box-shadow: 0 14px 30px rgba(31,36,32,.10);
+      }
+    }
+
+    section.faq{ padding: 64px 0 16px; }
+    .faq-list{
+      max-width: 920px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      align-items: start;
+      gap: 12px 18px;
+    }
   }
 </style>
 </head>
@@ -542,6 +819,17 @@
     </div>
   </main>
 
+  <section class="steps wrap">
+    <div class="steps-head">
+      <h2>Cara Pesan</h2>
+      <p>Prosesnya singkat, dari pilih tema sampai website siap dipakai.</p>
+      <p class="steps-hint">Geser untuk lihat langkah berikutnya &rarr;</p>
+    </div>
+    <div class="steps-list" id="steps-list">
+      <!-- item langkah dibuat otomatis oleh JS dari CONFIG.steps -->
+    </div>
+  </section>
+
   <section class="faq wrap">
     <div class="faq-head">
       <h2>Pertanyaan yang Sering Ditanyakan</h2>
@@ -553,7 +841,16 @@
   </section>
 
   <footer>
-    <div id="footer-text"></div>
+    <div class="footer-inner wrap">
+      <div class="footer-cta">
+        <a id="footer-wa-link" target="_blank" rel="noopener">Chat kami di WhatsApp</a>
+      </div>
+      <div class="footer-links" id="footer-links">
+        <!-- link sosial media diisi otomatis dari CONFIG.socialLinks, kalau ada -->
+      </div>
+      <p class="footer-hours" id="footer-hours"></p>
+      <p class="footer-copy" id="footer-text"></p>
+    </div>
   </footer>
 
   <!-- Bubble WhatsApp mengambang -->
@@ -594,6 +891,18 @@
     introText:  "Jelajahi berbagai contoh website booking untuk hotel, villa, homestay, kos, dan penginapan dengan pilihan tema yang berbeda.",
     footerText: "&copy; " + new Date().getFullYear() + " Abibo Studio",
 
+    // Link sosial media / portofolio untuk ditampilkan di footer (opsional).
+    // Kosongkan array ini ([]) kalau belum ada yang mau ditampilkan.
+    // Contoh: { label: "Instagram", url: "https://instagram.com/abibostudio" }
+    socialLinks: [
+      // { label: "Instagram", url: "https://instagram.com/USERNAME_KAMU" },
+      // { label: "Portofolio", url: "https://..." },
+    ],
+
+    // Jam respon chat (opsional). Kosongkan "" untuk sembunyikan baris ini.
+    // Contoh: "Respon cepat setiap hari, pukul 08.00\u201321.00 WIB"
+    responseHours: "",
+
     // Logo (link Google Drive otomatis dikonversi jadi gambar langsung)
     logoDriveId: "13o-zNBSidt2ANuLY8Bv6EOcpKz8vvHsJ",
     logoInitials: "AS", // dipakai jika gambar logo gagal dimuat
@@ -617,10 +926,42 @@
     previewEnabled: true,
 
     // ------------------------------------------------------------
+    // CARA PESAN
+    // Ditampilkan sebagai 4 langkah singkat di bawah hero.
+    // Tambah/ubah langkah = edit array ini, tidak perlu ubah HTML.
+    // ------------------------------------------------------------
+    steps: [
+      {
+        title: "Pilih Tema",
+        desc: "Jelajahi contoh website di bawah, pilih gaya yang paling sesuai dengan usahamu."
+      },
+      {
+        title: "Chat via WhatsApp",
+        desc: "Ketuk tombol \"Tanya\" pada tema pilihan untuk konsultasi langsung dengan tim kami."
+      },
+      {
+        title: "Kirim Materi",
+        desc: "Kirim nama usaha, logo, foto, dan warna yang diinginkan (kalau ada)."
+      },
+      {
+        title: "Website Siap Dipakai",
+        desc: "Kami kerjakan sesuai tema pilihan dan kirim link jadi dalam beberapa hari kerja."
+      }
+    ],
+
+    // ------------------------------------------------------------
     // TAB KATEGORI
     // Tambah tab baru = tambah satu objek baru di array ini:
     //   { id: "id-unik", label: "Nama Tab", links: [ ... ] }
     // Tab akan otomatis muncul di navigasi, tidak perlu ubah HTML/CSS.
+    //
+    // HARGA (opsional):
+    // - Beda per produk -> tambah "priceFrom" di tiap link, muncul sebagai
+    //   badge kecil di pojok kartu. Contoh: priceFrom: "Rp 250rb"
+    // - Sama untuk satu kategori -> tambah "priceNote" di level tab,
+    //   muncul sebagai satu baris di atas grid kartu kategori itu.
+    //   Contoh: priceNote: "Mulai dari Rp 300rb"
+    // Kosongkan / hapus kedua field ini kalau belum mau menampilkan harga.
     // ------------------------------------------------------------
     tabs: [
       {
@@ -630,8 +971,6 @@
           { name: "Luxury 1", url: "https://stayhub-luxury-1.vercel.app/" },
           { name: "Luxury 2", url: "https://stayhub-luxury-2.vercel.app/" },
           { name: "Luxury 3", url: "https://stayhub-luxury-3.vercel.app/" },
-          { name: "Luxury 4", url: "https://stayhub-luxury-4.vercel.app/" },
-          { name: "Luxury 5", url: "https://stayhub-luxury-5.vercel.app/" },                  
           // { name: "Nama Link Baru", url: "https://contoh-link.vercel.app/", preview: false },
         ]
       },
@@ -697,6 +1036,29 @@
   document.getElementById('site-intro').textContent = CONFIG.introText;
   document.getElementById('footer-text').innerHTML = CONFIG.footerText;
 
+  // --- Footer: tombol WA, link sosial media, jam respon ---
+  document.getElementById('footer-wa-link').href = buildWaLink(CONFIG.siteTitle);
+
+  const footerLinks = document.getElementById('footer-links');
+  (CONFIG.socialLinks || []).forEach(function(item){
+    const a = document.createElement('a');
+    a.href = item.url;
+    a.textContent = item.label;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    footerLinks.appendChild(a);
+  });
+  if (!CONFIG.socialLinks || !CONFIG.socialLinks.length){
+    footerLinks.style.display = 'none';
+  }
+
+  const footerHours = document.getElementById('footer-hours');
+  if (CONFIG.responseHours){
+    footerHours.textContent = CONFIG.responseHours;
+  } else {
+    footerHours.style.display = 'none';
+  }
+
   // --- Logo: coba beberapa sumber gambar Google Drive, lalu fallback teks ---
   (function loadLogo(){
     const badge = document.getElementById('logo-badge');
@@ -735,6 +1097,18 @@
       .map(w => w[0].toUpperCase())
       .join('');
   }
+
+  // --- Bangun "Cara Pesan" dari CONFIG.steps ---
+  const stepsList = document.getElementById('steps-list');
+  (CONFIG.steps || []).forEach(function(step, i){
+    const item = document.createElement('div');
+    item.className = 'step-item';
+    item.innerHTML =
+      '<div class="step-num">' + (i + 1) + '</div>' +
+      '<p class="step-title">' + step.title + '</p>' +
+      '<p class="step-desc">' + step.desc + '</p>';
+    stepsList.appendChild(item);
+  });
 
   function buildWaLink(name){
     const msg = CONFIG.waMessageTemplate.replace('{name}', name);
@@ -789,6 +1163,7 @@
 
     card.innerHTML =
       previewHtml +
+      (link.priceFrom ? '<span class="price-badge">Mulai ' + link.priceFrom + '</span>' : '') +
       '<div class="card-icon">' + initials(link.name) + '</div>' +
       '<p class="card-name">' + link.name + '</p>' +
       (CONFIG.cardSubLabel ? '<p class="card-sub">' + CONFIG.cardSubLabel + '</p>' : '') +
@@ -866,6 +1241,13 @@
     panel.setAttribute('aria-labelledby', btn.id);
     if (index !== 0) panel.hidden = true;
 
+    if (tab.priceNote){
+      const priceNote = document.createElement('p');
+      priceNote.className = 'tab-price-note';
+      priceNote.textContent = tab.priceNote;
+      panel.appendChild(priceNote);
+    }
+
     const grid = document.createElement('div');
     grid.className = 'grid';
     tab.links.forEach(function(link){
@@ -897,10 +1279,20 @@
   (CONFIG.faq || []).forEach(function(item, i){
     const details = document.createElement('details');
     details.className = 'faq-item';
-    if (i === 0) details.open = true;
 
     const summary = document.createElement('summary');
-    summary.textContent = item.q;
+
+    const qSpan = document.createElement('span');
+    qSpan.className = 'faq-q';
+    qSpan.textContent = item.q;
+
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'faq-icon';
+    iconSpan.textContent = '+';
+    iconSpan.setAttribute('aria-hidden', 'true');
+
+    summary.appendChild(qSpan);
+    summary.appendChild(iconSpan);
 
     const answer = document.createElement('p');
     answer.textContent = item.a;
@@ -954,6 +1346,31 @@
   document.getElementById('wa-note-close').addEventListener('click', function(){
     waNote.classList.remove('show');
   });
+
+  // --- Animasi scroll reveal (fade + naik sedikit saat elemen masuk layar) ---
+  // Otomatis nonaktif kalau browser tidak mendukung IntersectionObserver,
+  // atau pengguna mengaktifkan "prefers-reduced-motion" di sistemnya.
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if ('IntersectionObserver' in window && !prefersReducedMotion){
+    const revealTargets = document.querySelectorAll(
+      '.card, .step-item, .faq-item, .steps-head, .faq-head'
+    );
+    revealTargets.forEach(function(el, i){
+      el.classList.add('reveal');
+      el.style.transitionDelay = (i % 5) * 70 + 'ms';
+    });
+
+    const revealObserver = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -30px 0px' });
+
+    revealTargets.forEach(function(el){ revealObserver.observe(el); });
+  }
 
 })();
 </script>
